@@ -1,5 +1,7 @@
 # Homelab Reference
 
+[![Validate reference](https://github.com/raullopezpenalva/homelab-reference/actions/workflows/validate.yml/badge.svg)](https://github.com/raullopezpenalva/homelab-reference/actions/workflows/validate.yml)
+
 A guide and Infrastructure as Code reference for building and operating your own
 homelab with an AI coding assistant. It retains the engineering patterns of an
 operated lab: clear ownership, documented decisions, virtualization, private

@@ -48,7 +48,8 @@ The wrapper installs/initializes nothing and does not run workload integration.
 `python3 operations/validation/integration.py` prints a plan only. The separate
 CI job executes the guarded synthetic container/SQL/encrypted-recovery trial on
 a fresh hosted runner, without published ports or lab credentials. See the
-[trial guide](../../docs/getting-started/reproducible-trial.md). This job has not run.
+[trial guide](../../docs/getting-started/reproducible-trial.md). The
+[first hosted trial passed](../../docs/evidence/2026-11-22-publication.md).
 
 `images.lock.json` fixes the public image baseline. Its registry verification is
 not a vulnerability scan. The API build and a real VM still need their own

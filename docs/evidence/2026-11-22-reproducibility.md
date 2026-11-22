@@ -1,5 +1,8 @@
 # Reproducibility iteration: observed local evidence
 
+Historical pre-publication snapshot. For current hosted acceptance/publication,
+see the [publication evidence](2026-11-22-publication.md).
+
 Date: 2026-11-22. Scope: independently authored local source and temporary staging.
 
 ## Fixes under test

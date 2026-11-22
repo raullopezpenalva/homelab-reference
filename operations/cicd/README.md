@@ -14,4 +14,4 @@ The GitHub `application-trial` job is a separate hosted test environment: fresh
 synthetic credentials/data, no published ports, no registry push and an isolated
 encrypted backup/restore trial. It installs its test-only restic client on the
 hosted runner and uploads only a sanitized result. It never targets a homelab.
-Its implementation is prepared; no successful job run is claimed yet.
+Its [first hosted run passed](../../docs/evidence/2026-11-22-publication.md).

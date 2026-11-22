@@ -1,5 +1,8 @@
 # Category organization evidence
 
+Historical pre-publication snapshot. For current hosted acceptance/publication,
+see the [publication evidence](2026-11-22-publication.md).
+
 Date: 2026-11-22. Scope: the independently authored local reference only.
 The private source was read, not modified; no operational access was requested.
 

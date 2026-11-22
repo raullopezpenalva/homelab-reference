@@ -1,6 +1,6 @@
 # ADR 0006: Separate artifacts, environment promotion and data
 
-Date: 2026-11-22. Status: implemented boundaries; runtime procedures untested.
+Date: 2026-11-22. Status: implemented boundaries; hosted application/restore passed, VM trials pending.
 
 Building/publishing an image should not itself authorize a change to the lab.
 Select reviewed image digests and configuration for one environment, record a
