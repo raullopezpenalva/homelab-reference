@@ -1,0 +1,8 @@
+---
+lab_domain: lab.example.com
+lab_dns_serial: 2026112201
+lab_dns_clients: [10.64.20.0/24]
+lab_dns_records:
+  - {name: app, address: 10.64.30.21}
+  - {name: metrics, address: 10.64.20.31}
+  - {name: ci, address: 10.64.20.41}

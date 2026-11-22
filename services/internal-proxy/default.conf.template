@@ -1,0 +1,15 @@
+server {
+    listen 8080;
+    server_name app.${LAB_DOMAIN};
+    location / { proxy_pass http://${APPLICATION_UPSTREAM}; }
+}
+server {
+    listen 8080;
+    server_name metrics.${LAB_DOMAIN};
+    location / { proxy_pass http://${GRAFANA_UPSTREAM}; }
+}
+server {
+    listen 8080;
+    server_name ci.${LAB_DOMAIN};
+    location / { proxy_pass http://${CI_UPSTREAM}; }
+}

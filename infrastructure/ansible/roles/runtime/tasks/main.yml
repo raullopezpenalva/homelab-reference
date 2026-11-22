@@ -1,0 +1,211 @@
+---
+- name: Require reviewed Docker package versions
+  ansible.builtin.assert:
+    that:
+      - lab_runtime_versions is defined
+      - lab_runtime_versions.keys() | sort == ['containerd.io', 'docker-buildx-plugin', 'docker-ce', 'docker-ce-cli', 'docker-compose-plugin'] | sort
+      - lab_docker_key_sha256 is defined
+      - lab_docker_key_sha256 is match('^[a-f0-9]{64}$')
+    fail_msg: Supply exact package versions and the reviewed public repository key checksum.
+
+- name: Verify a separately prepared data mount
+  ansible.builtin.command:
+    argv: [findmnt, --noheadings, --mountpoint, /srv/lab, --output, UUID]
+  register: runtime_mount
+  changed_when: false
+
+- name: Require the approved data filesystem
+  ansible.builtin.assert:
+    that:
+      - lab_data_uuid is defined
+      - runtime_mount.stdout | trim == lab_data_uuid
+      - lab_data_uuid | length > 10
+    fail_msg: Prepare and verify the dedicated data filesystem first. This role never formats disks.
+
+- name: Inspect recorded runtime filesystem identity
+  ansible.builtin.stat:
+    path: /etc/reference-runtime-uuid
+  register: runtime_uuid_file
+
+- name: Read only the recorded filesystem identity
+  ansible.builtin.slurp:
+    src: /etc/reference-runtime-uuid
+  register: runtime_uuid
+  when: runtime_uuid_file.stat.exists
+
+- name: Refuse moving an existing runtime to another filesystem
+  ansible.builtin.assert:
+    that:
+      - not runtime_uuid_file.stat.exists or runtime_uuid.content | b64decode | trim == lab_data_uuid
+    fail_msg: A different filesystem requires a separate storage migration.
+
+- name: Inspect existing packages before any runtime installation
+  ansible.builtin.package_facts:
+    manager: apt
+
+- name: Reject incompatible distribution runtimes
+  ansible.builtin.assert:
+    that:
+      - "['docker.io', 'containerd', 'podman-docker', 'docker-compose'] | intersect(ansible_facts.packages.keys() | list) | length == 0"
+    fail_msg: Runtime migration is a separate operation; no packages or existing data will be removed.
+
+- name: Inspect runtime ownership marker
+  ansible.builtin.stat:
+    path: /etc/reference-runtime-owned
+  register: runtime_marker
+
+- name: Inspect potential unmanaged runtime files
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop: [/etc/docker/daemon.json, /etc/containerd/config.toml, /var/lib/docker, /var/lib/containerd, /srv/lab/docker, /srv/lab/containerd]
+  register: runtime_existing
+
+- name: Refuse automatic adoption of existing runtimes
+  ansible.builtin.assert:
+    that:
+      - runtime_marker.stat.exists or not item.stat.exists
+      - runtime_marker.stat.exists or 'docker-ce' not in ansible_facts.packages
+      - runtime_marker.stat.exists or 'containerd.io' not in ansible_facts.packages
+  loop: "{{ runtime_existing.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: Validate exact package versions before writing configuration
+  ansible.builtin.assert:
+    that:
+      - item.value is match('^[0-9][a-zA-Z0-9.+:~_-]+$')
+  loop: "{{ lab_runtime_versions | dict2items }}"
+
+- name: Record reference runtime ownership before resumable installation
+  ansible.builtin.copy:
+    dest: /etc/reference-runtime-owned
+    content: "reference-runtime/v1\n"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create reference runtime directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /usr/local/libexec
+    - /etc/apt/keyrings
+    - /etc/docker
+    - /srv/lab/docker
+    - /srv/lab/containerd
+    - /etc/containerd
+    - /etc/systemd/system/docker.service.d
+    - /etc/systemd/system/containerd.service.d
+
+- name: Obtain the checksum-verified Docker public signing key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    checksum: "sha256:{{ lab_docker_key_sha256 }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Configure the signed vendor package repository
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/reference-docker.sources
+    content: |
+      Types: deb
+      URIs: https://download.docker.com/linux/ubuntu
+      Suites: noble
+      Components: stable
+      Architectures: amd64
+      Signed-By: /etc/apt/keyrings/docker.asc
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Configure runtime storage and bounded logs
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    content: '{"data-root":"/srv/lab/docker","log-driver":"local","log-opts":{"max-size":"10m","max-file":"3"}}'
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart reference Docker
+
+- name: Configure containerd storage independently
+  ansible.builtin.copy:
+    dest: /etc/containerd/config.toml
+    content: |
+      version = 2
+      root = "/srv/lab/containerd"
+      state = "/run/containerd"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart reference containerd
+
+- name: Install the exact-filesystem boot guard
+  ansible.builtin.copy:
+    src: storage-check.py
+    dest: /usr/local/libexec/reference-storage-check.py
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Record the accepted runtime filesystem
+  ansible.builtin.copy:
+    dest: /etc/reference-runtime-uuid
+    content: "{{ lab_data_uuid }}\n"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Bind runtime startup to the data filesystem
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/{{ item }}.service.d/reference-data.conf"
+    content: |
+      [Unit]
+      RequiresMountsFor=/srv/lab
+      ConditionPathIsMountPoint=/srv/lab
+      [Service]
+      ExecStartPre=/usr/bin/python3 /usr/local/libexec/reference-storage-check.py {{ lab_data_uuid }}
+    owner: root
+    group: root
+    mode: '0644'
+  loop: [docker, containerd]
+  notify: Reload reference systemd
+
+- name: Install reviewed runtime packages without implicit startup
+  ansible.builtin.apt:
+    name: "{{ lab_runtime_versions | dictsort | map('join', '=') | list }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+    policy_rc_d: 101
+  notify:
+    - Restart reference containerd
+    - Restart reference Docker
+
+- name: Refresh installed package evidence after the complete transaction
+  ansible.builtin.package_facts:
+    manager: apt
+
+- name: Require installed runtime versions to match the reviewed selection
+  ansible.builtin.assert:
+    that:
+      - item.key in ansible_facts.packages
+      - ansible_facts.packages[item.key][0].version == item.value
+    fail_msg: Installed runtime packages differ from the reviewed selection. Stop and review recovery before starting services.
+  loop: "{{ lab_runtime_versions | dict2items }}"
+
+- name: Apply runtime configuration in dependency order
+  ansible.builtin.meta: flush_handlers
+
+- name: Start reference runtimes
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+    daemon_reload: true
+  loop: [containerd, docker]

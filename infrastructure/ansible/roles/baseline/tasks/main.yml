@@ -1,0 +1,30 @@
+---
+- name: Install guest support and a private metrics exporter
+  ansible.builtin.apt:
+    name: [ca-certificates, curl, python3, qemu-guest-agent, prometheus-node-exporter]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Start the guest agent without rebooting
+  ansible.builtin.systemd_service:
+    name: qemu-guest-agent
+    state: started
+    enabled: true
+
+- name: Limit exporter to the selected guest address and basic collectors
+  ansible.builtin.copy:
+    dest: /etc/default/prometheus-node-exporter
+    content: |
+      ARGS="--web.listen-address={{ ansible_host }}:9100 --collector.disable-defaults
+      --collector.cpu --collector.meminfo --collector.filesystem --collector.loadavg --collector.uname"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart reference node exporter
+
+- name: Enable exporter after external network policy has been reviewed
+  ansible.builtin.systemd_service:
+    name: prometheus-node-exporter
+    state: started
+    enabled: true

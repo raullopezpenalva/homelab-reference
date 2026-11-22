@@ -1,0 +1,54 @@
+name: homelab-reference
+services:
+  proxy:
+    image: ${PROXY_IMAGE:?Copy .env.example to .env and review images}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${HTTP_PORT:-8080}:8080"
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    networks: [frontend]
+  app:
+    image: ${APP_IMAGE:?Set APP_IMAGE}
+    restart: unless-stopped
+    volumes:
+      - ./app/index.html:/usr/share/nginx/html/index.html:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    networks: [frontend]
+  prometheus:
+    profiles: [monitoring]
+    image: ${PROMETHEUS_IMAGE:?Set PROMETHEUS_IMAGE}
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --storage.tsdb.retention.size=512MB
+    ports:
+      - "127.0.0.1:${METRICS_PORT:-9090}:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - metrics:/prometheus
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    networks: [metrics]
+networks:
+  frontend: {}
+  metrics: {}
+volumes:
+  metrics: {}

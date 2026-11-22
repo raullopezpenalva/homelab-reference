@@ -1,0 +1,38 @@
+---
+- name: Create directories required by the declared service files
+  ansible.builtin.file:
+    path: "/srv/lab/{{ lab_bundle }}/{{ item | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ bundle_static_files[lab_bundle] }}"
+
+- name: Stage only the declared static service files
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../../services/{{ bundle_source_dirs[lab_bundle] }}/{{ item }}"
+    dest: "/srv/lab/{{ lab_bundle }}/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ bundle_static_files[lab_bundle] }}"
+  register: bundle_files
+
+- name: Render local non-secret service inputs
+  ansible.builtin.template:
+    src: environment.j2
+    dest: "/srv/lab/{{ lab_bundle }}/.env"
+    owner: root
+    group: root
+    mode: '0600'
+  register: bundle_inputs
+
+- name: Render inventory-driven monitoring targets with a single owner
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /srv/lab/telemetry/prometheus.yml
+    owner: root
+    group: root
+    mode: '0644'
+  register: bundle_monitoring_config
+  when: lab_bundle == 'telemetry'

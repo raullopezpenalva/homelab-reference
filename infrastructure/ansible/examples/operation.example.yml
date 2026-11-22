@@ -1,0 +1,17 @@
+---
+# Copy outside Git, review every value, and run only against your new lab.
+lab_operation_approved: false
+lab_target: workload01
+lab_change_scope: "Describe one selected host and the exact intended changes."
+lab_recovery_plan: "Record backup identifier and tested rollback or rebuild steps."
+lab_data_uuid: REPLACE_WITH_VERIFIED_DEDICATED_FILESYSTEM_UUID
+lab_docker_key_sha256: REPLACE_WITH_REVIEWED_VENDOR_KEY_CHECKSUM
+lab_runtime_versions:
+  docker-ce: REPLACE_WITH_EXACT_NOBLE_PACKAGE_VERSION
+  docker-ce-cli: REPLACE_WITH_EXACT_NOBLE_PACKAGE_VERSION
+  containerd.io: REPLACE_WITH_EXACT_NOBLE_PACKAGE_VERSION
+  docker-buildx-plugin: REPLACE_WITH_EXACT_NOBLE_PACKAGE_VERSION
+  docker-compose-plugin: REPLACE_WITH_EXACT_NOBLE_PACKAGE_VERSION
+lab_bundle: applications
+lab_bind_address: 127.0.0.1
+lab_secret_dir: /etc/reference-secrets

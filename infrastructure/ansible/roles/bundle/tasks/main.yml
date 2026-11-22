@@ -1,0 +1,56 @@
+---
+- name: Bind service bundle to the selected role
+  ansible.builtin.assert:
+    that:
+      - lab_bundle in ['applications', 'database', 'telemetry', 'automation', 'sandbox', 'ingress']
+      - lab_role == ({'database':'applications', 'ingress':'foundation'}.get(lab_bundle, lab_bundle))
+      - lab_images is defined
+      - lab_secret_dir is defined
+      - lab_bind_address | default('127.0.0.1') in ['127.0.0.1', ansible_host]
+    fail_msg: Review bundle, host role, image map, secret location and explicit bind address.
+
+- name: Require exactly the image keys consumed by this bundle
+  ansible.builtin.assert:
+    that:
+      - lab_images.keys() | sort == bundle_required_images[lab_bundle] | sort
+  vars:
+    bundle_required_images:
+      ingress: [NGINX_IMAGE]
+      applications: [NGINX_IMAGE, API_IMAGE]
+      database: [POSTGRES_IMAGE]
+      telemetry: [PROMETHEUS_IMAGE, GRAFANA_IMAGE]
+      automation: [JENKINS_IMAGE]
+      sandbox: [NGINX_IMAGE]
+
+- name: Require image references by immutable digest
+  ansible.builtin.assert:
+    that:
+      - item.value is match('^[a-zA-Z0-9./:_-]+@sha256:[a-f0-9]{64}$')
+    fail_msg: VM service deployment requires reviewed image digests, not mutable tags.
+  loop: "{{ lab_images | dict2items }}"
+
+- name: Verify the dedicated data filesystem before staging services
+  ansible.builtin.command:
+    argv: [findmnt, --noheadings, --mountpoint, /srv/lab, --output, UUID]
+  register: bundle_mount
+  changed_when: false
+
+- name: Require the selected data filesystem
+  ansible.builtin.assert:
+    that:
+      - lab_data_uuid is defined
+      - lab_data_uuid | length > 10
+      - bundle_mount.stdout | trim == lab_data_uuid
+
+- name: Stage only declared service files and generated configuration
+  ansible.builtin.import_tasks: stage.yml
+
+- name: Apply the explicitly selected Compose project
+  community.docker.docker_compose_v2:
+    project_src: "/srv/lab/{{ lab_bundle }}"
+    state: present
+    recreate: "{{ 'always' if bundle_files.changed or bundle_inputs.changed or bundle_monitoring_config.changed | default(false) else 'auto' }}"
+    pull: missing
+    remove_orphans: false
+    wait: true
+    wait_timeout: 180

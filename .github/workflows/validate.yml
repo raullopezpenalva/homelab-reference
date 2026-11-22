@@ -1,0 +1,86 @@
+name: Validate reference
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - run: pip install -r operations/validation/requirements.txt
+      - run: python3 operations/validation/check.py
+      - run: python3 -m unittest discover -s operations/validation/tests -v
+      - run: yamllint .
+      - run: shellcheck operations/validation/*.sh operations/backups/*.sh services/database/init.sh
+      - run: |
+          ansible-galaxy collection install -r infrastructure/ansible/requirements.yml
+          cd infrastructure/ansible
+          for file in playbooks/*.yml; do
+            ansible-playbook --syntax-check "$file"
+          done
+          ansible-lint --offline playbooks/*.yml
+      - run: |
+          docker compose --project-directory services/starter --env-file services/starter/.env.example --profile monitoring config --quiet
+          for bundle in services/{applications,database,observability,jenkins,sandbox,internal-proxy} operations/backups/restore-example; do
+            docker compose --project-directory "$bundle" --env-file "$bundle/.env.example" config --quiet
+          done
+      - run: npx --yes markdownlint-cli@0.50.1 '**/*.md' --ignore '**/.terraform/**' --ignore '**/.ansible/**' --ignore '**/.cache/**' --disable MD013 MD033 MD041
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: '1.14.9'
+      - run: terraform fmt -check -recursive infrastructure/proxmox
+      - run: terraform -chdir=infrastructure/proxmox/environments/lab init -backend=false -input=false
+      - run: terraform -chdir=infrastructure/proxmox/environments/lab validate
+      - name: Mocked provider tests only - no infrastructure plan
+        run: terraform -chdir=infrastructure/proxmox/environments/lab test
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Gitleaks full repository scan
+        run: >-
+          docker run --rm -v "$PWD:/repo:ro" zricethezav/gitleaks:v8.24.2
+          git /repo --redact --no-banner
+      - name: Trivy configuration scan
+        run: >-
+          docker run --rm -v "$PWD:/repo:ro" aquasec/trivy:0.76.2
+          config --exit-code 1 --severity HIGH,CRITICAL /repo
+
+  application-trial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install the test-only encrypted backup client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends restic
+      - name: Synthetic application and encrypted recovery trial
+        run: python3 operations/validation/integration.py --execute --report "$RUNNER_TEMP/reference-integration-result.json"
+      - name: Retain sanitized test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: application-trial-result
+          path: ${{ runner.temp }}/reference-integration-result.json
+          if-no-files-found: error
+          retention-days: 14

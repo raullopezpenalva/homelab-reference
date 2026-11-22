@@ -1,0 +1,17 @@
+name: reference-automation
+services:
+  jenkins:
+    image: ${JENKINS_IMAGE:?Set reviewed JENKINS_IMAGE}
+    restart: unless-stopped
+    ports: ["${LAB_BIND_ADDRESS:-127.0.0.1}:8081:8080"]
+    volumes:
+      - controller:/var/jenkins_home
+      - ./controller.groovy:/usr/share/jenkins/ref/init.groovy.d/reference.groovy:ro
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    mem_limit: 1536m
+    networks: [controller]
+networks:
+  controller: {}
+volumes:
+  controller: {}

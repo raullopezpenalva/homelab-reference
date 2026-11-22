@@ -1,0 +1,5 @@
+---
+- name: Reload reference DNS
+  ansible.builtin.systemd_service:
+    name: named
+    state: reloaded

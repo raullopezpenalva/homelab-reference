@@ -1,0 +1,77 @@
+{
+  "schema": "reference.images/v1",
+  "resolved_on": "2026-11-22",
+  "status": "Registry manifest verified; vulnerability and runtime acceptance pending",
+  "images": {
+    "python": {
+      "source_tag": "library/python:3.12-slim",
+      "image": "library/python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",
+      "platforms": [
+        "linux/386",
+        "linux/amd64",
+        "linux/arm",
+        "linux/arm64",
+        "linux/ppc64le",
+        "linux/riscv64",
+        "linux/s390x"
+      ]
+    },
+    "postgres": {
+      "source_tag": "library/postgres:17-alpine",
+      "image": "library/postgres@sha256:f9cf3e1f0066f0eb0c48707d864f0ac5941e9ff454a072077d97a4d278d07d73",
+      "platforms": [
+        "linux/386",
+        "linux/amd64",
+        "linux/arm",
+        "linux/arm64",
+        "linux/ppc64le",
+        "linux/riscv64",
+        "linux/s390x"
+      ]
+    },
+    "nginx": {
+      "source_tag": "nginxinc/nginx-unprivileged:stable-alpine",
+      "image": "nginxinc/nginx-unprivileged@sha256:f5116ed4606f3eb015dd4a8e28cb9b351476dc0ad4bc6e9f93b19cec130cdf03",
+      "platforms": [
+        "linux/386",
+        "linux/amd64",
+        "linux/arm",
+        "linux/arm64",
+        "linux/ppc64le",
+        "linux/riscv64",
+        "linux/s390x"
+      ]
+    },
+    "prometheus": {
+      "source_tag": "prom/prometheus:v3.5.0",
+      "image": "prom/prometheus@sha256:63805ebb8d2b3920190daf1cb14a60871b16fd38bed42b857a3182bc621f4996",
+      "platforms": [
+        "linux/amd64",
+        "linux/arm",
+        "linux/arm64",
+        "linux/ppc64le",
+        "linux/s390x"
+      ]
+    },
+    "grafana": {
+      "source_tag": "grafana/grafana:12.0.2",
+      "image": "grafana/grafana@sha256:b5b59bfc7561634c2d7b136c4543d702ebcc94a3da477f21ff26f89ffd4214fa",
+      "platforms": [
+        "linux/amd64",
+        "linux/arm",
+        "linux/arm64"
+      ]
+    },
+    "jenkins": {
+      "source_tag": "jenkins/jenkins:lts-jdk21",
+      "image": "jenkins/jenkins@sha256:74401de6a6f92e1afe1b02d1c8e3d0c33f263bfb5275dd8813f9150355f2367b",
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64",
+        "linux/ppc64le",
+        "linux/riscv64",
+        "linux/s390x"
+      ]
+    }
+  }
+}

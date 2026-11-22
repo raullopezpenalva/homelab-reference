@@ -1,0 +1,64 @@
+{
+  "domain": "lab.example.com",
+  "bootstrap_user": "labadmin",
+  "dns_servers": [
+    "192.0.2.53"
+  ],
+  "guests": {
+    "foundation": {
+      "name": "resolver01",
+      "vm_id": 2407,
+      "address": "10.64.20.11/24",
+      "gateway": "10.64.20.1",
+      "vlan_id": 220,
+      "cores": 1,
+      "memory_mb": 1024,
+      "os_gib": 16,
+      "data_gib": 8
+    },
+    "applications": {
+      "name": "workload01",
+      "vm_id": 2423,
+      "address": "10.64.30.21/24",
+      "gateway": "10.64.30.1",
+      "vlan_id": 230,
+      "cores": 2,
+      "memory_mb": 3072,
+      "os_gib": 24,
+      "data_gib": 32
+    },
+    "telemetry": {
+      "name": "metrics01",
+      "vm_id": 2441,
+      "address": "10.64.20.31/24",
+      "gateway": "10.64.20.1",
+      "vlan_id": 220,
+      "cores": 2,
+      "memory_mb": 3072,
+      "os_gib": 24,
+      "data_gib": 32
+    },
+    "automation": {
+      "name": "builder01",
+      "vm_id": 2467,
+      "address": "10.64.20.41/24",
+      "gateway": "10.64.20.1",
+      "vlan_id": 220,
+      "cores": 2,
+      "memory_mb": 3072,
+      "os_gib": 24,
+      "data_gib": 24
+    },
+    "sandbox": {
+      "name": "sandbox01",
+      "vm_id": 2489,
+      "address": "10.64.50.51/24",
+      "gateway": "10.64.50.1",
+      "vlan_id": 250,
+      "cores": 2,
+      "memory_mb": 2048,
+      "os_gib": 24,
+      "data_gib": 16
+    }
+  }
+}

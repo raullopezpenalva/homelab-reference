@@ -1,0 +1,10 @@
+---
+# For the applications bundle. Use the exact keys required by each bundle.
+# Invalid placeholders deliberately fail the deployment guard until replaced.
+lab_images:
+  NGINX_IMAGE: REPLACE_WITH_REVIEWED_NGINX_IMAGE_BY_DIGEST
+  API_IMAGE: REPLACE_WITH_YOUR_BUILT_API_IMAGE_BY_DIGEST
+# database: POSTGRES_IMAGE
+# telemetry: PROMETHEUS_IMAGE and GRAFANA_IMAGE
+# automation: JENKINS_IMAGE
+# sandbox: NGINX_IMAGE

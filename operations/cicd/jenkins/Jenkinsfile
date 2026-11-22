@@ -1,0 +1,19 @@
+pipeline {
+  agent { label 'reference-validation' }
+  options {
+    disableConcurrentBuilds()
+    timeout(time: 15, unit: 'MINUTES')
+    skipDefaultCheckout(true)
+  }
+  stages {
+    stage('Checkout') { steps { checkout scm } }
+    stage('Offline checks') {
+      steps {
+        sh 'python3 operations/validation/check.py'
+        sh 'python3 -m unittest discover -s operations/validation/tests -v'
+        sh 'terraform fmt -check -recursive infrastructure/proxmox'
+      }
+    }
+  }
+  // No polling trigger, infrastructure credentials, Docker socket or deploy step.
+}

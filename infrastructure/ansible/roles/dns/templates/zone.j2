@@ -1,0 +1,8 @@
+$TTL 300
+@ IN SOA ns.{{ lab_domain }}. hostmaster.{{ lab_domain }}. (
+  {{ lab_dns_serial }} 3600 600 604800 300 )
+@ IN NS ns.{{ lab_domain }}.
+ns IN A {{ ansible_host }}
+{% for record in lab_dns_records %}
+{{ record.name }} IN A {{ record.address }}
+{% endfor %}

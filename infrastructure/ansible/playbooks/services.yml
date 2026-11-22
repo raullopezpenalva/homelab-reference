@@ -1,0 +1,11 @@
+---
+- name: Deploy one explicitly selected service bundle
+  hosts: "{{ lab_target | default('no_target_selected') }}"
+  gather_facts: false
+  become: true
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Authorize the exact operation
+      ansible.builtin.import_tasks: ../tasks/authorize.yml
+  roles:
+    - bundle

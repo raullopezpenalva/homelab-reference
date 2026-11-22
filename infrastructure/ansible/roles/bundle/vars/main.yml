@@ -1,0 +1,17 @@
+---
+bundle_source_dirs:
+  applications: applications
+  database: database
+  telemetry: observability
+  automation: jenkins
+  sandbox: sandbox
+  ingress: internal-proxy
+
+# Generated files, README files and local env/private material are never copied.
+bundle_static_files:
+  applications: [compose.yaml, nginx.conf, index.html]
+  database: [compose.yaml, init.sh]
+  telemetry: [compose.yaml, rules.yml, datasource.yml, dashboard-provider.yml, dashboards/reference.json]
+  automation: [compose.yaml, controller.groovy]
+  sandbox: [compose.yaml, index.html]
+  ingress: [compose.yaml, nginx.conf, default.conf.template]

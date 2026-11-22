@@ -1,0 +1,12 @@
+# Fictional values only. Copy to an ignored private file; replace every input.
+node_name      = "pve-demo"
+datastore_id   = "vm-demo"
+bridge         = "vmbr-demo"
+template_vm_id = 8800
+enabled_roles  = []
+# Provide bootstrap DNS in your private JSON catalog; 192.0.2.53 is NOT a resolver.
+# Provide only public keys here; token via a private environment, never tfvars.
+ssh_public_keys    = []
+operation_approved = false
+started            = false
+on_boot            = false

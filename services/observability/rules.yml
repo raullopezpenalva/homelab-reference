@@ -1,0 +1,10 @@
+groups:
+  - name: reference-basics
+    rules:
+      - alert: ReferenceGuestUnavailable
+        expr: up{job="reference-guests"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: A reference guest metrics endpoint is unavailable

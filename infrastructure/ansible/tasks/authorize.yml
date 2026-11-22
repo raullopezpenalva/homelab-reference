@@ -1,0 +1,25 @@
+---
+- name: Require an explicit single-host operation before opening an SSH session
+  ansible.builtin.assert:
+    that:
+      - lab_operation_approved | default(false) | bool
+      - lab_target is defined
+      - inventory_hostname == lab_target
+      - ansible_play_hosts_all | length == 1
+      - ansible_connection | default('ssh') == 'ssh'
+      - lab_change_scope | default('') | length > 10
+      - lab_recovery_plan | default('') | length > 10
+      - not ansible_check_mode
+    fail_msg: Select one host, record scope and recovery, and explicitly approve the operation.
+  tags: always
+
+- name: Gather facts only after authorization
+  ansible.builtin.setup:
+
+- name: Require the documented guest platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == 'Ubuntu'
+      - ansible_facts.distribution_version == '24.04'
+      - ansible_facts.architecture == 'x86_64'
+    fail_msg: This reference currently supports fresh Ubuntu 24.04 amd64 guests only.

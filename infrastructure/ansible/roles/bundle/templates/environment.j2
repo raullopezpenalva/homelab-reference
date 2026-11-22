@@ -1,0 +1,12 @@
+# Non-secret local inputs. Credential contents are never rendered here.
+LAB_BIND_ADDRESS={{ lab_bind_address | default('127.0.0.1') }}
+LAB_SECRET_DIR={{ lab_secret_dir }}
+{% for key, image in lab_images.items() %}
+{{ key }}={{ image }}
+{% endfor %}
+{% if lab_bundle == 'ingress' %}
+LAB_DOMAIN={{ lab_domain }}
+APPLICATION_UPSTREAM={{ lab_application_upstream | mandatory }}
+GRAFANA_UPSTREAM={{ lab_grafana_upstream | mandatory }}
+CI_UPSTREAM={{ lab_ci_upstream | mandatory }}
+{% endif %}

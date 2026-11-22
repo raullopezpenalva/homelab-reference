@@ -1,0 +1,14 @@
+options {
+  directory "/var/cache/bind";
+  listen-on { 127.0.0.1; {{ ansible_host }}; };
+  listen-on-v6 { none; };
+  recursion no;
+  allow-query { 127.0.0.1; {% for client in lab_dns_clients %}{{ client }}; {% endfor %} };
+  allow-transfer { none; };
+  version "not disclosed";
+};
+zone "{{ lab_domain }}" {
+  type primary;
+  file "/etc/bind/db.reference";
+  allow-update { none; };
+};

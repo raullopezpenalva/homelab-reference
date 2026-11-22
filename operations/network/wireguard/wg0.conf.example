@@ -1,0 +1,11 @@
+# Fictional teaching template only; never run or import without a private design.
+# Generate keys privately; choose routes and an external firewall independently.
+[Interface]
+Address = 10.64.60.1/24
+ListenPort = 51820
+PrivateKey = REPLACE_PRIVATELY_DO_NOT_COMMIT
+
+[Peer]
+PublicKey = REPLACE_WITH_NEW_CLIENT_PUBLIC_KEY
+AllowedIPs = 10.64.60.2/32
+# No endpoint, private peer key, PostUp firewall rule or real routing is supplied.

@@ -1,0 +1,19 @@
+---
+- name: Configure authoritative lab DNS on one foundation guest
+  hosts: "{{ lab_target | default('no_target_selected') }}"
+  gather_facts: false
+  become: true
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Authorize the exact operation
+      ansible.builtin.import_tasks: ../tasks/authorize.yml
+    - name: Require a foundation host and a reviewed DNS catalog
+      ansible.builtin.assert:
+        that:
+          - lab_role == 'foundation'
+          - lab_dns_records is defined
+          - lab_dns_serial is defined
+          - lab_dns_clients is defined
+          - lab_domain is match('^[a-z0-9.-]+$')
+  roles:
+    - dns

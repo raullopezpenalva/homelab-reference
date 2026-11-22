@@ -1,0 +1,34 @@
+---
+- name: Install authoritative DNS without implicit daemon start
+  ansible.builtin.apt:
+    name: [bind9, bind9-utils]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+    policy_rc_d: 101
+
+- name: Render and validate the zone before replacing it
+  ansible.builtin.template:
+    src: zone.j2
+    dest: /etc/bind/db.reference
+    owner: root
+    group: bind
+    mode: '0644'
+    validate: "named-checkzone {{ lab_domain }} %s"
+  notify: Reload reference DNS
+
+- name: Configure authoritative-only scoped DNS
+  ansible.builtin.template:
+    src: named.conf.j2
+    dest: /etc/bind/named.conf
+    owner: root
+    group: bind
+    mode: '0644'
+    validate: named-checkconf %s
+  notify: Reload reference DNS
+
+- name: Start authoritative DNS
+  ansible.builtin.systemd_service:
+    name: named
+    state: started
+    enabled: true
