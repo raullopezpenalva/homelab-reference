@@ -8,13 +8,13 @@ network range, account or deployment is listed here.
 | --- | --- | --- | --- |
 | infrastructure | Proxmox VMs | Terraform module, fictional catalog and mock tests | Not deployed |
 | infrastructure | Guest configuration | Baseline, data/runtime guards, DNS and service playbooks | No guest convergence tested |
-| services | Application/data | Frontend, read-only demo API and separate PostgreSQL project | No full startup/SQL trial |
+| services | Application/data | Frontend, read-only demo API and separate PostgreSQL project | Hosted synthetic frontend/API/SQL trial passed |
 | services | Private ingress | NGINX HTTP example | No network/TLS acceptance |
 | services | Observability | Prometheus, Grafana datasource/dashboard and host exporter | No live targets verified |
 | services | Optional CI/development | Jenkins controller and sandbox definitions | Not installed |
 | operations | Delivery/validation | Offline metadata checker, tests, smoke scripts and CI examples | No automatic deployment engine |
-| operations | Recovery | Explicit encrypted backup and isolated restore tooling | No actual backup/restore executed |
-| operations | Hosted integration | Canonical app/SQL/encrypted-restore harness, CI job and guard tests | Implemented, not executed |
+| operations | Recovery | Explicit encrypted backup and isolated restore tooling | Hosted encrypted backup/isolated restore passed; off-host recovery pending |
+| operations | Hosted integration | Canonical app/SQL/encrypted-restore harness, CI job and guard tests | First hosted application/restore run passed |
 | operations | Private access | Fictional WireGuard template | No tunnel/router configuration |
 | secrets | Custody | Policy and private-file workflow | No identity or credential included |
 

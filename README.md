@@ -105,7 +105,7 @@ scope. Local staging regressions exercise the real Ansible file tasks in a
 private temporary directory. The CI trial is prepared to test frontend/API/SQL,
 read-only access, independent application updates and encrypted backup/restore on
 a fresh hosted runner, without published ports or infrastructure credentials.
-It has not run yet. See [the reproducible trial guide](docs/getting-started/reproducible-trial.md).
+The [first hosted run passed](docs/evidence/2026-11-22-publication.md). See [the reproducible trial guide](docs/getting-started/reproducible-trial.md).
 
 A real Proxmox plan, host configuration or lab deployment is a separate operation
 requiring an explicit destination, scope and recovery plan.

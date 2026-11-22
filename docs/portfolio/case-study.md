@@ -57,7 +57,7 @@ files, removes published ports, uses new synthetic identities/data and a separat
 restore destination, and cleans up only its own test resources. It defaults to a
 plan; execution is restricted to a fresh GitHub-hosted runner with the local
 Docker socket. Its CI job and sanitized result artifact are implemented but have
-not been executed here.
+now passed in the [first hosted run](../evidence/2026-11-22-publication.md).
 
 ## Evidence and limits
 
@@ -67,8 +67,8 @@ Proxmox provisioning, guest convergence, package installation, network isolation
 and a complete infrastructure recovery remain unverified. The Docker application
 trial cannot prove these properties even when it passes.
 
-The next milestone is an observed synthetic CI application/restore run, followed
-by a separately approved disposable VM trial with a second convergence pass.
+The hosted synthetic application/restore milestone has passed. The next milestone
+is a separately approved disposable VM trial with a second convergence pass.
 A completed implementation or static/mock test is not substituted for that
 acceptance. No private original infrastructure or deployment evidence is needed
 to demonstrate these engineering practices publicly.

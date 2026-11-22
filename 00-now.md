@@ -15,7 +15,7 @@ AI assistant, including explanations of technology choices and operating process
 The two reviewed regressions are corrected: static/template ownership and one
 package-version transaction with post-install checks. Public images are fixed by
 digest. Local staging regressions now measure repeat delivery; a separate hosted
-application/recovery trial is implemented but unexecuted. See the
+application/recovery trial has passed its first hosted run. See the
 [case study](docs/portfolio/case-study.md) and [evidence](docs/evidence/2026-11-22-reproducibility.md).
 
 ## Next selected steps

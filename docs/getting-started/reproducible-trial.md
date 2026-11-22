@@ -58,8 +58,9 @@ credential, inventory, endpoint, published image or lab SSH identity is involved
 The report artifact contains only fixed check names/results, public image digests
 and a completion time. Raw Docker/SQL/restic output is never copied to it.
 
-This harness has not been executed during authoring. Passing unit tests for its
-guards is not a successful application trial. When CI is explicitly enabled/run,
+The [first hosted trial passed](../evidence/2026-11-22-publication.md). Passing
+unit tests for its guards alone is not a successful application trial. When you
+run CI for a later revision,
 inspect the result artifact and job status; do not infer success from the plan.
 The encrypted test repository is temporary and local to the runner: this tests
 backup-format/restore mechanics, not off-host or disaster recovery durability.

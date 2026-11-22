@@ -1,0 +1,38 @@
+{
+  "schema": "reference.integration/v1",
+  "status": "passed",
+  "target": "fresh-github-hosted-linux-runner-local-docker",
+  "steps": [
+    "build-api",
+    "start-database",
+    "start-application",
+    "frontend-api-sql",
+    "read-only-database-role",
+    "independent-web-repeat",
+    "encrypted-backup",
+    "isolated-restore",
+    "restored-data",
+    "cleanup"
+  ],
+  "images": {
+    "python": "library/python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",
+    "postgres": "library/postgres@sha256:f9cf3e1f0066f0eb0c48707d864f0ac5941e9ff454a072077d97a4d278d07d73",
+    "nginx": "nginxinc/nginx-unprivileged@sha256:f5116ed4606f3eb015dd4a8e28cb9b351476dc0ad4bc6e9f93b19cec130cdf03"
+  },
+  "data": "new-synthetic-only",
+  "published_ports": [],
+  "scope_limit": "Container integration only; no VM provisioning, host convergence or off-host disaster recovery",
+  "checks": {
+    "build-api": "passed",
+    "start-database": "passed",
+    "start-application": "passed",
+    "frontend-api-sql": "passed",
+    "read-only-database-role": "passed",
+    "independent-web-repeat": "passed",
+    "encrypted-backup": "passed",
+    "isolated-restore": "passed",
+    "restored-data": "passed",
+    "cleanup": "passed"
+  },
+  "completed_at": "2026-11-22T12:09:48.827919+00:00"
+}

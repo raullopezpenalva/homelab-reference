@@ -29,7 +29,7 @@ skips; full mode fails if those regressions cannot run. The consolidated report
 stores only check IDs/status. [Iteration evidence](evidence/2026-11-22-reproducibility.md)
 records the scope and final preservation/privacy checks.
 
-## Implemented, not executed
+## Hosted application acceptance and remaining VM trials
 
 The hosted `application-trial` job builds the synthetic API from the pinned base,
 starts canonical database/application configurations without published ports,
@@ -37,14 +37,16 @@ checks frontend/API/SQL and the read-only database role, repeats web delivery,
 runs the real encrypted-backup/isolated-restore scripts and cleans its own
 resources. It produces a sanitized artifact. Its default local command is a plan;
 execution is restricted to a fresh GitHub-hosted Linux runner with the local
-Docker endpoint. **The job has not run.** Guard tests and plan output do not
-establish a successful integration or restore.
+Docker endpoint. **The first hosted job passed.** See the [accepted run and sanitized
+artifact](evidence/2026-11-22-publication.md). Its result establishes application
+integration and encrypted backup/restore mechanics within that isolated runner.
 
 The VM path has not been executed: Proxmox cloning, template compatibility, host
 convergence, actual package installation, secret-file permissions, guest startup,
 network isolation, VPN/TLS and complete recovery remain unverified. No original
 infrastructure, router, SSH endpoint or operational API was contacted. No local
-container start/build, SQL/backup/restore or GitHub publication was performed.
+container workload or original-infrastructure operation was performed. Hosted
+container/SQL/backup/restore validation and public publication are recorded separately.
 
 ## Remaining publication gates
 
@@ -53,14 +55,16 @@ container start/build, SQL/backup/restore or GitHub publication was performed.
 - [x] Fix public example image identities and document update/review boundaries.
 - [x] Provide a case study, coherent learning path and consolidated local checks.
 - [x] Prepare a guarded hosted application/encrypted-recovery test and evidence artifact.
-- [ ] Run GitHub CI and inspect its actual result artifacts, including Markdown lint.
+- [x] Run GitHub CI and inspect its actual result artifacts, including Markdown lint.
 - [ ] Scan upstream images and dependencies; review vulnerabilities/provenance.
-- [ ] Run the hosted application trial successfully, including cleanup/failure behavior.
+- [x] Run the hosted application/restore trial successfully, including cleanup.
+- [ ] Rehearse induced runtime failure/cleanup paths beyond guard-unit coverage.
 - [ ] Accept one disposable Proxmox guest and repeat host/service convergence.
 - [ ] Test permitted/denied network flows and off-host recovery; VPN/TLS if selected.
 - [x] Owner authorized publication of this MIT-licensed public preview.
 - [ ] Obtain an additional independent human privacy/security review.
-- [ ] Configure a private vulnerability-reporting channel and define supported versions.
+- [x] Configure GitHub private vulnerability reporting for the public preview.
+- [ ] Define supported versions before a supported release.
 - [x] Owner explicitly authorized initial repository creation, commit and push.
 
 The initial commit is independent of the private source. No source history or
